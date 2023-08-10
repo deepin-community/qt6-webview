@@ -1,41 +1,5 @@
-/****************************************************************************
-**
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the QtWebView module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 3 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL3 included in the
-** packaging of this file. Please review the following information to
-** ensure the GNU Lesser General Public License version 3 requirements
-** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 2.0 or (at your option) the GNU General
-** Public license version 3 or any later version approved by the KDE Free
-** Qt Foundation. The licenses are as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
-** included in the packaging of this file. Please review the following
-** information to ensure the GNU General Public License requirements will
-** be met: https://www.gnu.org/licenses/gpl-2.0.html and
-** https://www.gnu.org/licenses/gpl-3.0.html.
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+// Copyright (C) 2015 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 package org.qtproject.qt.android.view;
 
@@ -47,6 +11,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
+import android.webkit.CookieManager;
 import java.lang.Runnable;
 import android.app.Activity;
 import android.content.Intent;
@@ -60,6 +25,7 @@ import java.util.concurrent.Semaphore;
 import java.lang.reflect.Method;
 import android.os.Build;
 import java.util.concurrent.TimeUnit;
+import java.time.format.DateTimeFormatter;
 
 public class QtAndroidWebViewController
 {
@@ -93,6 +59,8 @@ public class QtAndroidWebViewController
     private native void c_onReceivedTitle(long id, String title);
     private native void c_onRunJavaScriptResult(long id, long callbackId, String result);
     private native void c_onReceivedError(long id, int errorCode, String description, String url);
+    private native void c_onCookieAdded(long id, boolean result, String domain, String name);
+    private native void c_onCookieRemoved(long id, boolean result, String domain, String name);
 
     // We need to block the UI thread in some cases, if it takes to long we should timeout before
     // ANR kicks in... Usually the hard limit is set to 10s and if exceed that then we're in trouble.
@@ -217,6 +185,11 @@ public class QtAndroidWebViewController
                 m_webView = new WebView(m_activity);
                 m_hasLocationPermission = hasLocationPermission(m_webView);
                 WebSettings webSettings = m_webView.getSettings();
+
+                // The local storage options are not user changeable in QtWebView and disabled by default on Android.
+                // In QtWebEngine and on iOS local storage is enabled by default, so we follow that.
+                webSettings.setDatabaseEnabled(true);
+                webSettings.setDomStorageEnabled(true);
 
                 if (Build.VERSION.SDK_INT > 10) {
                     try {
@@ -518,5 +491,91 @@ public class QtAndroidWebViewController
                 m_webView.destroy();
             }
         });
+    }
+
+    private void setCookieImp(final String url, final String cookieString, ValueCallback<Boolean> callback)
+    {
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+
+        try {
+            cookieManager.setCookie(url, cookieString, callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setCookie(final String url, final String cookieString)
+    {
+        setCookieImp(url, cookieString, new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean value) {
+                try {
+                    c_onCookieAdded(m_id, value, url, cookieString.split("=")[0]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private boolean hasValidCookie(final String url, final String cookieString)
+    {
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeExpiredCookie();
+        boolean cookieFound = false;
+
+        final String domainCookie = cookieManager.getCookie(url);
+
+        String found = null;
+        if (domainCookie != null) {
+            String cookies[] = domainCookie.split(";");
+            for (final String cookie : cookies) {
+                if (cookie.startsWith(cookieString)) {
+                    found = cookie;
+                    // Cookie is "cleared" so not considered valid.
+                    cookieFound = !cookie.endsWith("=");
+                    break;
+                }
+            }
+        }
+
+        return cookieFound;
+    }
+
+    private String getExpireString()
+    {
+        return "expires=\"Thu, 1 Jan 1970 00:00:00 GMT\"";
+    }
+
+    public void removeCookie(final String url, final String cookieString)
+    {
+        // We need to work with what we have
+        // 1. Check if there's cookies for the url
+        final boolean hadCookie = hasValidCookie(url, cookieString);
+        if (hadCookie) {
+            // 2. Tag the string with an expire tag so it will be purged
+            final String removeCookieString = cookieString + ";" + getExpireString();
+            setCookieImp(url, removeCookieString, new ValueCallback<Boolean>() {
+                @Override
+                public void onReceiveValue(Boolean value) {
+                    try {
+                        // 3. Verify that the cookie was indeed removed
+                        final boolean removed = (hadCookie && !hasValidCookie(url, cookieString));
+                        c_onCookieRemoved(m_id, removed, url, cookieString.split("=")[0]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    public void removeCookies() {
+        try {
+            CookieManager.getInstance().removeAllCookies(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

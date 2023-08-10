@@ -13,7 +13,6 @@ usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6QWebEngineWebViewPluginAdditio
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6QWebEngineWebViewPluginConfig.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6QWebEngineWebViewPluginConfigVersion.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6QWebEngineWebViewPluginConfigVersionImpl.cmake
-usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6QWebEngineWebViewPluginDependencies.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6QWebEngineWebViewPluginTargets-none.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6QWebEngineWebViewPluginTargets.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewAdditionalTargetInfo.cmake
@@ -21,6 +20,7 @@ usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewConfig.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewConfigVersion.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewConfigVersionImpl.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewDependencies.cmake
+usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewPlugins.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewTargets-none.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewTargets.cmake
 usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewVersionlessTargets.cmake
@@ -38,6 +38,8 @@ usr/lib/${DEB_HOST_MULTIARCH}/libQt6WebViewQuick.prl
 usr/lib/${DEB_HOST_MULTIARCH}/libQt6WebViewQuick.so
 usr/lib/${DEB_HOST_MULTIARCH}/metatypes/qt6webview_none_metatypes.json
 usr/lib/${DEB_HOST_MULTIARCH}/metatypes/qt6webviewquick_none_metatypes.json
+usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/Qt6WebView.pc
+usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/Qt6WebViewQuick.pc
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/mkspecs/modules/qt_lib_webview.pri
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/mkspecs/modules/qt_lib_webviewquick.pri
 usr/share/qt6/modules/WebView.json

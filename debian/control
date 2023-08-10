@@ -1,31 +1,36 @@
 Source: qt6-webview
 Section: libs
 Priority: optional
-Maintainer: Deepin Developer <deepin-dev@deepin.org>
-Uploaders: Deepin Packages Builder <packages@deepin.org>
-Build-Depends: cmake (>= 3.18~),
+Maintainer: Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
+Uploaders: Patrick Franz <deltaone@debian.org>, Lu YaNing <dluyaning@gmail.com>
+Build-Depends: cmake (>= 3.24~),
                debhelper-compat (= 13),
                libgl-dev,
-               libqt6opengl6-dev (>= 6.2.4~),
                libssl-dev,
                libvulkan-dev [linux-any],
                libxcb-xkb-dev,
                ninja-build,
                pkg-config,
                pkg-kde-tools,
-               qt6-base-dev (>= 6.2.4~),
-               qt6-base-private-dev (>= 6.2.4~),
-               qt6-declarative-dev (>= 6.2.4~),
-               qt6-declarative-private-dev (>= 6.2.4~),
-               qt6-webengine-dev (>= 6.2.4~),
-               qt6-webengine-dev-tools (>= 6.2.4~),
-               qt6-webengine-private-dev (>= 6.2.4~),
-Standards-Version: 4.6.0
+               qml6-module-qtwebengine (>= 6.4.2+dfsg~),
+               qml6-module-qtwebengine-controlsdelegates (>= 6.4.2+dfsg~),
+               qt6-base-dev (>= 6.4.2+dfsg~),
+               qt6-base-private-dev (>= 6.4.2+dfsg~),
+               qt6-declarative-dev (>= 6.4.2+dfsg~),
+               qt6-declarative-private-dev (>= 6.4.2+dfsg~),
+               qt6-webengine-dev (>= 6.4.2+dfsg~),
+               qt6-webengine-dev-tools (>= 6.4.2+dfsg~),
+               qt6-webengine-private-dev (>= 6.4.2+dfsg~),
+Build-Depends-Indep: qt6-base-dev (>= 6.4~) <!nodoc>,
+                     qt6-documentation-tools (>= 6.4~) <!nodoc>,
+Standards-Version: 4.6.2
 Homepage: https://www.qt.io/developers/
+Vcs-Browser: https://salsa.debian.org/qt-kde-team/qt6/qt6-webview
+Vcs-Git: https://salsa.debian.org/qt-kde-team/qt6/qt6-webview.git
 Rules-Requires-Root: no
 
 Package: libqt6webview6
-Architecture: amd64 arm64 i386
+Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Pre-Depends: ${misc:Pre-Depends}
@@ -40,7 +45,7 @@ Description: Qt 6 WebView library
  This package contains the Qt 6 WebView library.
 
 Package: libqt6webviewquick6
-Architecture: amd64 arm64 i386
+Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Pre-Depends: ${misc:Pre-Depends}
@@ -55,7 +60,7 @@ Description: Qt 6 WebView Quick library
  This package contains the Qt 6 WebView Quick library.
 
 Package: qt6-webview-plugins
-Architecture: amd64 arm64 i386
+Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Depends: fontconfig, ${misc:Depends}, ${shlibs:Depends}
@@ -70,7 +75,7 @@ Description: Qt 6 WebView plugins
  This package contains Qt 6 WebView plugins.
 
 Package: qml6-module-qtwebview
-Architecture: amd64 arm64 i386
+Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
 Depends: qml6-module-qtwebengine, ${misc:Depends}, ${shlibs:Depends}
 Pre-Depends: ${misc:Pre-Depends}
@@ -85,7 +90,7 @@ Description: Qt 6 WebView QML module
  This package contains the Qt 6 WebView QML module.
 
 Package: qt6-webview-dev
-Architecture: amd64 arm64 i386
+Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
 Section: libdevel
 Depends: libqt6webview6 (= ${binary:Version}),
@@ -104,3 +109,36 @@ Description: Qt 6 WebView - development files
  .
  This package contains the development files needed to build Qt 6 applications
  using the Qt WebView library.
+
+Package: qt6-webview-doc
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Depends: qt6-base-doc, ${misc:Depends},
+Description: Qt 6 WebView documentation
+ Qt is a cross-platform C++ application framework. Qt's primary feature
+ is its rich set of widgets that provide standard GUI functionality.
+ .
+ This package contains the documentation for Qt 6 WebView.
+
+Package: qt6-webview-doc-html
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Depends: qt6-base-doc-html, ${misc:Depends},
+Description: Qt 6 WebView HTML documentation
+ Qt is a cross-platform C++ application framework. Qt's primary feature
+ is its rich set of widgets that provide standard GUI functionality.
+ .
+ This package contains the HTML documentation for Qt 6 WebView.
+
+Package: qt6-webview-examples
+Architecture: amd64 arm64 armhf i386
+Multi-Arch: same
+Section: misc
+Depends: ${misc:Depends}, ${shlibs:Depends},
+Description: Qt 6 WebView examples
+ Qt is a cross-platform C++ application framework. Qt's primary feature
+ is its rich set of widgets that provide standard GUI functionality.
+ .
+ This package contains the examples for the Qt WebView submodule.

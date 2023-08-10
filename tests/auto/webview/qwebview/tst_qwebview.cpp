@@ -1,41 +1,5 @@
-/****************************************************************************
-**
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the test suite of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 3 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL3 included in the
-** packaging of this file. Please review the following information to
-** ensure the GNU Lesser General Public License version 3 requirements
-** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 2.0 or (at your option) the GNU General
-** Public license version 3 or any later version approved by the KDE Free
-** Qt Foundation. The licenses are as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
-** included in the packaging of this file. Please review the following
-** information to ensure the GNU General Public License requirements will
-** be met: https://www.gnu.org/licenses/gpl-2.0.html and
-** https://www.gnu.org/licenses/gpl-3.0.html.
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+// Copyright (C) 2015 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include <QtTest/QtTest>
 #include <QtCore/qstandardpaths.h>
@@ -75,6 +39,7 @@ private slots:
     void runJavaScript();
     void loadHtml();
     void loadRequest();
+    void setAndDeleteCookie();
 
 private:
     const QString m_cacheLocation;
@@ -195,7 +160,7 @@ void tst_QWebView::loadRequest()
         QTRY_COMPARE(view.loadProgress(), 100);
         QTRY_COMPARE(view.title(), QStringLiteral("FooBar"));
         QCOMPARE(view.url(), url);
-        QTRY_COMPARE(loadChangedSingalSpy.count(), 2);
+        QTRY_COMPARE(loadChangedSingalSpy.size(), 2);
         {
             const QList<QVariant> &loadStartedArgs = loadChangedSingalSpy.takeFirst();
             const QWebViewLoadRequestPrivate &lr = loadStartedArgs.at(0).value<QWebViewLoadRequestPrivate>();
@@ -223,7 +188,7 @@ void tst_QWebView::loadRequest()
         QSignalSpy loadChangedSingalSpy(&view, SIGNAL(loadingChanged(const QWebViewLoadRequestPrivate &)));
         view.setUrl(QUrl(QStringLiteral("file:///file_that_does_not_exist.html")));
         QTRY_VERIFY(!view.isLoading());
-        QTRY_COMPARE(loadChangedSingalSpy.count(), 2);
+        QTRY_COMPARE(loadChangedSingalSpy.size(), 2);
         {
             const QList<QVariant> &loadStartedArgs = loadChangedSingalSpy.takeFirst();
             const QWebViewLoadRequestPrivate &lr = loadStartedArgs.at(0).value<QWebViewLoadRequestPrivate>();
@@ -238,6 +203,44 @@ void tst_QWebView::loadRequest()
         QCOMPARE(view.loadProgress(), 0); // darwin plugin returns 100
 #endif
     }
+}
+
+void tst_QWebView::setAndDeleteCookie()
+{
+#ifdef QT_WEBVIEW_WEBENGINE_BACKEND
+    QQmlEngine engine;
+    QQmlContext * rootContext = engine.rootContext();
+    QQuickWebView qview;
+    QQmlEngine::setContextForObject(&qview, rootContext);
+    QWebView & view = qview.webView();
+#else
+    QWebView view;
+#endif
+
+    QSignalSpy cookieAddedSpy(&view, SIGNAL(cookieAdded(const QString &, const QString &)));
+    QSignalSpy cookieRemovedSpy(&view, SIGNAL(cookieRemoved(const QString &, const QString &)));
+
+    view.setCookie(".example.com", "TestCookie", "testValue");
+    view.setCookie(".example2.com", "TestCookie2", "testValue2");
+    view.setCookie(".example3.com", "TestCookie3", "testValue3");
+    QTRY_COMPARE(cookieAddedSpy.size(), 3);
+
+    view.deleteCookie(".example.com", "TestCookie");
+    QTRY_COMPARE(cookieRemovedSpy.size(), 1);
+
+    // deleting a cookie using a name that has not been set
+    view.deleteCookie(".example.com", "NewCookieName");
+    QTRY_COMPARE(cookieRemovedSpy.size(), 1);
+
+    // deleting a cookie using a domain that has not been set
+    view.deleteCookie(".new.domain.com", "TestCookie2");
+    QTRY_COMPARE(cookieRemovedSpy.size(), 1);
+
+    view.deleteAllCookies();
+#ifdef Q_OS_ANDROID
+    QEXPECT_FAIL("", "Notification for deleteAllCookies() is not implemented on Android, yet!", Continue);
+#endif
+    QTRY_COMPARE(cookieRemovedSpy.size(), 3);
 }
 
 QTEST_MAIN(tst_QWebView)

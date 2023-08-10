@@ -1,16 +1,20 @@
-# SymbolsHelper-Confirmed: 6.2.2 amd64
+# SymbolsHelper-Confirmed: 6.4.0 amd64
 libQt6WebViewQuick.so.6 libqt6webviewquick6 #MINVER#
 * Build-Depends-Package: qt6-webview-dev
  _Z28qml_register_types_QtWebViewv@Base 6.2.2
  _ZN13QQuickWebView10itemChangeEN10QQuickItem10ItemChangeERKNS0_14ItemChangeDataE@Base 6.2.2
  _ZN13QQuickWebView10urlChangedEv@Base 6.2.2
+ _ZN13QQuickWebView11cookieAddedERK7QStringS2_@Base 6.3.0
  _ZN13QQuickWebView11qt_metacallEN11QMetaObject4CallEiPPv@Base 6.2.2
  _ZN13QQuickWebView11qt_metacastEPKc@Base 6.2.2
+ _ZN13QQuickWebView12deleteCookieERK7QStringS2_@Base 6.3.0
  _ZN13QQuickWebView12takeCallbackEi@Base 6.2.2
  _ZN13QQuickWebView12titleChangedEv@Base 6.2.2
+ _ZN13QQuickWebView13cookieRemovedERK7QStringS2_@Base 6.3.0
  _ZN13QQuickWebView13runJavaScriptERK7QStringRK8QJSValue@Base 6.2.2
  _ZN13QQuickWebView14loadingChangedEP24QQuickWebViewLoadRequest@Base 6.2.2
  _ZN13QQuickWebView14onFocusRequestEb@Base 6.2.2
+ _ZN13QQuickWebView16deleteAllCookiesEv@Base 6.3.0
  _ZN13QQuickWebView16onLoadingChangedERK26QWebViewLoadRequestPrivate@Base 6.2.2
  _ZN13QQuickWebView16setHttpUserAgentERK7QString@Base 6.2.2
  _ZN13QQuickWebView16staticMetaObjectE@Base 6.2.2
@@ -24,6 +28,7 @@ libQt6WebViewQuick.so.6 libqt6webviewquick6 #MINVER#
  _ZN13QQuickWebView6setUrlERK4QUrl@Base 6.2.2
  _ZN13QQuickWebView8loadHtmlERK7QStringRK4QUrl@Base 6.2.2
  _ZN13QQuickWebView9goForwardEv@Base 6.2.2
+ _ZN13QQuickWebView9setCookieERK7QStringS2_S2_@Base 6.3.0
  _ZN13QQuickWebViewC1EP10QQuickItem@Base 6.2.2
  _ZN13QQuickWebViewC2EP10QQuickItem@Base 6.2.2
  _ZN13QQuickWebViewD0Ev@Base 6.2.2
@@ -75,28 +80,12 @@ libQt6WebViewQuick.so.6 libqt6webviewquick6 #MINVER#
  _ZTV13QQuickWebView@Base 6.2.2
  _ZTV20QQuickViewController@Base 6.2.2
  _ZTV24QQuickWebViewLoadRequest@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI4QUrlE10getCopyCtrEvENUlPKNS_18QMetaTypeInterfaceEPvPKvE_4_FUNES5_S6_S8_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI4QUrlE10getMoveCtrEvENUlPKNS_18QMetaTypeInterfaceEPvS6_E_4_FUNES5_S6_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI4QUrlE13getDefaultCtrEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES5_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI4QUrlE7getDtorEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES5_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI7QStringE10getCopyCtrEvENUlPKNS_18QMetaTypeInterfaceEPvPKvE_4_FUNES5_S6_S8_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI7QStringE10getMoveCtrEvENUlPKNS_18QMetaTypeInterfaceEPvS6_E_4_FUNES5_S6_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI7QStringE13getDefaultCtrEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES5_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI7QStringE7getDtorEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES5_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI8QVariantE10getCopyCtrEvENUlPKNS_18QMetaTypeInterfaceEPvPKvE_4_FUNES5_S6_S8_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI8QVariantE10getMoveCtrEvENUlPKNS_18QMetaTypeInterfaceEPvS6_E_4_FUNES5_S6_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI8QVariantE13getDefaultCtrEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES5_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeI8QVariantE7getDtorEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES5_S6_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeIbE10getCopyCtrEvENUlPKNS_18QMetaTypeInterfaceEPvPKvE_4_FUNES4_S5_S7_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeIbE10getMoveCtrEvENUlPKNS_18QMetaTypeInterfaceEPvS5_E_4_FUNES4_S5_S5_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeIbE13getDefaultCtrEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES4_S5_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeIiE10getCopyCtrEvENUlPKNS_18QMetaTypeInterfaceEPvPKvE_4_FUNES4_S5_S7_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeIiE10getMoveCtrEvENUlPKNS_18QMetaTypeInterfaceEPvS5_E_4_FUNES4_S5_S5_@Base 6.2.2
- (optional=templinst)_ZZN9QtPrivate16QMetaTypeForTypeIiE13getDefaultCtrEvENUlPKNS_18QMetaTypeInterfaceEPvE_4_FUNES4_S5_@Base 6.2.2
  (c++)"non-virtual thunk to QQuickViewController::componentComplete()@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickViewController::~QQuickViewController()@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::canGoBack() const@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::canGoForward() const@Base" 6.2.2
+ (c++)"non-virtual thunk to QQuickWebView::deleteAllCookies()@Base" 6.3.0
+ (c++)"non-virtual thunk to QQuickWebView::deleteCookie(QString const&, QString const&)@Base" 6.3.0
  (c++)"non-virtual thunk to QQuickWebView::goBack()@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::goForward()@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::httpUserAgent() const@Base" 6.2.2
@@ -105,6 +94,7 @@ libQt6WebViewQuick.so.6 libqt6webviewquick6 #MINVER#
  (c++)"non-virtual thunk to QQuickWebView::loadProgress() const@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::reload()@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::runJavaScriptPrivate(QString const&, int)@Base" 6.2.2
+ (c++)"non-virtual thunk to QQuickWebView::setCookie(QString const&, QString const&, QString const&)@Base" 6.3.0
  (c++)"non-virtual thunk to QQuickWebView::setHttpUserAgent(QString const&)@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::setUrl(QUrl const&)@Base" 6.2.2
  (c++)"non-virtual thunk to QQuickWebView::stop()@Base" 6.2.2

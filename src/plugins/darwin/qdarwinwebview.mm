@@ -1,41 +1,5 @@
-/****************************************************************************
-**
-** Copyright (C) 2016 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the QtWebView module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 3 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL3 included in the
-** packaging of this file. Please review the following information to
-** ensure the GNU Lesser General Public License version 3 requirements
-** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 2.0 or (at your option) the GNU General
-** Public license version 3 or any later version approved by the KDE Free
-** Qt Foundation. The licenses are as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
-** included in the packaging of this file. Please review the following
-** information to ensure the GNU General Public License requirements will
-** be met: https://www.gnu.org/licenses/gpl-2.0.html and
-** https://www.gnu.org/licenses/gpl-3.0.html.
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qdarwinwebview_p.h"
 #include <private/qwebview_p.h>
@@ -46,6 +10,9 @@
 #include <QtCore/qdatetime.h>
 #include <QtCore/qmap.h>
 #include <QtCore/qvariant.h>
+
+#include <QtQuick/qquickrendercontrol.h>
+#include <QtQuick/qquickwindow.h>
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <WebKit/WebKit.h>
@@ -362,8 +329,11 @@ void QDarwinWebViewPrivate::setParentView(QObject *view)
     if (!wkWebView)
         return;
 
+    // NOTE: We delay adding the uiView to the scene
+    // if the window is not backed by a platform window
+    // see: updateParent().
     QWindow *w = qobject_cast<QWindow *>(view);
-    if (w) {
+    if (w && w->handle()) {
         UIView *parentView = reinterpret_cast<UIView *>(w->winId());
         [parentView addSubview:wkWebView];
     } else {
@@ -397,6 +367,26 @@ void QDarwinWebViewPrivate::setVisible(bool visible)
 void QDarwinWebViewPrivate::setFocus(bool focus)
 {
     Q_EMIT requestFocus(focus);
+}
+
+void QDarwinWebViewPrivate::updatePolish()
+{
+    // This is a special case for when the WebView is inside a QQuickWidget...
+    // We delay adding the view until we can verify that we have a non-hidden platform window.
+    if (m_parentView && wkWebView.superview == nullptr) {
+        if (auto window = qobject_cast<QWindow *>(m_parentView)) {
+            if (window->visibility() != QWindow::Hidden) {
+                UIView *parentView = nullptr;
+                if (window->handle())
+                    parentView = reinterpret_cast<UIView *>(window->winId());
+                else if (auto rw = QQuickRenderControl::renderWindowFor(qobject_cast<QQuickWindow *>(window)))
+                    parentView = reinterpret_cast<UIView *>(rw->winId());
+
+                if (parentView)
+                    [parentView addSubview:wkWebView];
+            }
+        }
+    }
 }
 
 void QDarwinWebViewPrivate::goBack()
@@ -467,6 +457,74 @@ void QDarwinWebViewPrivate::runJavaScriptPrivate(const QString &script, int call
     [wkWebView evaluateJavaScript:script.toNSString() completionHandler:^(id result, NSError *) {
         if (callbackId != -1)
             Q_EMIT javaScriptResult(callbackId, fromJSValue(result));
+    }];
+}
+
+void QDarwinWebViewPrivate::setCookie(const QString &domain, const QString &name, const QString &value)
+{
+    NSString *cookieDomain = domain.toNSString();
+    NSString *cookieName = name.toNSString();
+    NSString *cookieValue = value.toNSString();
+
+    WKHTTPCookieStore *cookieStore = wkWebView.configuration.websiteDataStore.httpCookieStore;
+
+    if (cookieStore == nullptr) {
+        return;
+    }
+
+    NSMutableDictionary *cookieProperties = [NSMutableDictionary dictionary];
+    [cookieProperties setObject:cookieName forKey:NSHTTPCookieName];
+    [cookieProperties setObject:cookieValue forKey:NSHTTPCookieValue];
+    [cookieProperties setObject:cookieDomain forKey:NSHTTPCookieDomain];
+    [cookieProperties setObject:cookieDomain forKey:NSHTTPCookieOriginURL];
+    [cookieProperties setObject:@"/" forKey:NSHTTPCookiePath];
+    [cookieProperties setObject:@"0" forKey:NSHTTPCookieVersion];
+
+    NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
+
+    if (cookie == nullptr) {
+        return;
+    }
+
+    [cookieStore setCookie:cookie completionHandler:^{
+        Q_EMIT cookieAdded(QString::fromNSString(cookie.domain), QString::fromNSString(cookie.name));
+    }];
+}
+
+void QDarwinWebViewPrivate::deleteCookie(const QString &domain, const QString &name)
+{
+    NSString *cookieDomain = domain.toNSString();
+    NSString *cookieName = name.toNSString();
+
+    WKHTTPCookieStore *cookieStore = wkWebView.configuration.websiteDataStore.httpCookieStore;
+
+    if (cookieStore == nullptr) {
+        return;
+    }
+
+    [cookieStore getAllCookies:^(NSArray *cookies) {
+        NSHTTPCookie *cookie;
+        for (cookie in cookies) {
+            if (cookie.domain == cookieDomain && cookie.name == cookieName) {
+                [cookieStore deleteCookie:cookie completionHandler:^{
+                    Q_EMIT cookieRemoved(QString::fromNSString(cookie.domain), QString::fromNSString(cookie.name));
+                }];
+            }
+        }
+    }];
+}
+
+void QDarwinWebViewPrivate::deleteAllCookies()
+{
+    WKHTTPCookieStore *cookieStore = wkWebView.configuration.websiteDataStore.httpCookieStore;
+
+    [cookieStore getAllCookies:^(NSArray *cookies) {
+        NSHTTPCookie *cookie;
+        for (cookie in cookies) {
+            [cookieStore deleteCookie:cookie completionHandler:^{
+                Q_EMIT cookieRemoved(QString::fromNSString(cookie.domain), QString::fromNSString(cookie.name));
+            }];
+        }
     }];
 }
 
