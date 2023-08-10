@@ -1,41 +1,5 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the QtWebView module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 3 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL3 included in the
-** packaging of this file. Please review the following information to
-** ensure the GNU Lesser General Public License version 3 requirements
-** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 2.0 or (at your option) the GNU General
-** Public license version 3 or any later version approved by the KDE Free
-** Qt Foundation. The licenses are as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
-** included in the packaging of this file. Please review the following
-** information to ensure the GNU General Public License requirements will
-** be met: https://www.gnu.org/licenses/gpl-2.0.html and
-** https://www.gnu.org/licenses/gpl-3.0.html.
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+// Copyright (C) 2017 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qquickwebview_p.h"
 #include "qquickwebviewloadrequest_p.h"
@@ -104,6 +68,8 @@ QQuickWebView::QQuickWebView(QQuickItem *parent)
     connect(m_webView, &QWebView::requestFocus, this, &QQuickWebView::onFocusRequest);
     connect(m_webView, &QWebView::javaScriptResult, this, &QQuickWebView::onRunJavaScriptResult);
     connect(m_webView, &QWebView::httpUserAgentChanged, this, &QQuickWebView::httpUserAgentChanged);
+    connect(m_webView, &QWebView::cookieAdded, this, &QQuickWebView::cookieAdded);
+    connect(m_webView, &QWebView::cookieRemoved, this, &QQuickWebView::cookieRemoved);
 }
 
 QQuickWebView::~QQuickWebView() { }
@@ -307,6 +273,58 @@ void QQuickWebView::runJavaScript(const QString &script, const QJSValue &callbac
 void QQuickWebView::runJavaScriptPrivate(const QString &script, int callbackId)
 {
     m_webView->runJavaScriptPrivate(script, callbackId);
+}
+
+/*!
+    \qmlmethod void QtWebView::WebView::setCookie(string domain, string name, string value)
+    \since QtWebView 6.3
+    Adds a cookie with the specified \a domain, \a name and \a value.
+
+    The \l cookieAdded signal will be emitted when the cookie is added.
+*/
+/*!
+    \qmlsignal QtWebView::WebView::cookieAdded(string domain, string name)
+
+    This signal is emitted when a cookie is added.
+
+    The parameters provide information about the \a domain and the \a name of the added cookie.
+
+    \note When Qt WebEngine module is used as backend, cookieAdded signal will be emitted for any
+    cookie added to the underlying QWebEngineCookieStore, including those added by websites.
+    In other cases cookieAdded signal is only emitted for cookies explicitly added with \l setCookie().
+*/
+void QQuickWebView::setCookie(const QString &domain, const QString &name, const QString &value)
+{
+    m_webView->setCookie(domain, name, value);
+}
+
+/*!
+    \qmlmethod void QtWebView::WebView::deleteCookie(string domain, string name)
+    \since QtWebView 6.3
+    Deletes a cookie with the specified \a domain and \a name.
+
+    The \l cookieRemoved signal will be emitted when the cookie is deleted.
+*/
+/*!
+    \qmlsignal QtWebView::WebView::cookieRemoved(string domain, string name)
+
+    This signal is emitted when a cookie is deleted.
+
+    The parameters provide information about the \a domain and the \a name of the deleted cookie.
+*/
+void QQuickWebView::deleteCookie(const QString &domain, const QString &name)
+{
+    m_webView->deleteCookie(domain, name);
+}
+
+/*!
+    \qmlmethod void QtWebView::WebView::deleteAllCookies()
+    \since QtWebView 6.3
+    Deletes all the cookies.
+*/
+void QQuickWebView::deleteAllCookies()
+{
+    m_webView->deleteAllCookies();
 }
 
 void QQuickWebView::itemChange(ItemChange change, const ItemChangeData &value)

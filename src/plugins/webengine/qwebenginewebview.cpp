@@ -1,41 +1,5 @@
-/****************************************************************************
-**
-** Copyright (C) 2016 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the QtWebView module of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:LGPL$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** GNU Lesser General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 3 as published by the Free Software
-** Foundation and appearing in the file LICENSE.LGPL3 included in the
-** packaging of this file. Please review the following information to
-** ensure the GNU Lesser General Public License version 3 requirements
-** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
-**
-** GNU General Public License Usage
-** Alternatively, this file may be used under the terms of the GNU
-** General Public License version 2.0 or (at your option) the GNU General
-** Public license version 3 or any later version approved by the KDE Free
-** Qt Foundation. The licenses are as published by the Free Software
-** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
-** included in the packaging of this file. Please review the following
-** information to ensure the GNU General Public License requirements will
-** be met: https://www.gnu.org/licenses/gpl-2.0.html and
-** https://www.gnu.org/licenses/gpl-3.0.html.
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "qwebenginewebview_p.h"
 #include <QtWebView/private/qwebview_p.h>
@@ -58,6 +22,9 @@
 #include <QtWebEngineQuick/private/qquickwebenginesettings_p.h>
 #include <QtWebEngineCore/qwebengineloadinginfo.h>
 
+#include <QWebEngineCookieStore>
+#include <QNetworkCookie>
+
 QT_BEGIN_NAMESPACE
 
 static QByteArray qmlSource()
@@ -71,6 +38,7 @@ QWebEngineWebViewPrivate::QWebEngineWebViewPrivate(QObject *p)
     : QAbstractWebView(p), m_profile(nullptr)
 {
     m_webEngineView.m_parent = this;
+    m_cookieStore.m_webEngineViewPtr = &m_webEngineView;
 }
 
 QWebEngineWebViewPrivate::~QWebEngineWebViewPrivate()
@@ -150,6 +118,32 @@ void QWebEngineWebViewPrivate::runJavaScriptPrivate(const QString &script,
                                                     int callbackId)
 {
     m_webEngineView->runJavaScript(script, QQuickWebView::takeCallback(callbackId));
+}
+
+void QWebEngineWebViewPrivate::setCookie(const QString &domain, const QString &name, const QString &value)
+{
+    QNetworkCookie cookie;
+    cookie.setDomain(domain);
+    cookie.setName(QByteArray(name.toUtf8()));
+    cookie.setValue(QByteArray(value.toUtf8()));
+    cookie.setPath("/");
+
+    m_cookieStore->setCookie(cookie);
+}
+
+void QWebEngineWebViewPrivate::deleteCookie(const QString &domain, const QString &name)
+{
+    QNetworkCookie cookie;
+    cookie.setDomain(domain);
+    cookie.setName(QByteArray(name.toUtf8()));
+    cookie.setPath("/");
+
+    m_cookieStore->deleteCookie(cookie);
+}
+
+void QWebEngineWebViewPrivate::deleteAllCookies()
+{
+    m_cookieStore->deleteAllCookies();
 }
 
 void QWebEngineWebViewPrivate::setVisible(bool visible)
@@ -236,6 +230,16 @@ void QWebEngineWebViewPrivate::q_httpUserAgentChanged()
      Q_EMIT httpUserAgentChanged(m_httpUserAgent);
 }
 
+void QWebEngineWebViewPrivate::q_cookieAdded(const QNetworkCookie &cookie)
+{
+    Q_EMIT cookieAdded(cookie.domain(), cookie.name());
+}
+
+void QWebEngineWebViewPrivate::q_cookieRemoved(const QNetworkCookie &cookie)
+{
+    Q_EMIT cookieRemoved(cookie.domain(), cookie.name());
+}
+
 void QWebEngineWebViewPrivate::QQuickWebEngineViewPtr::init() const
 {
     Q_ASSERT(!m_webEngineView);
@@ -277,8 +281,26 @@ void QWebEngineWebViewPrivate::QQuickWebEngineViewPtr::init() const
     QObject::connect(webEngineView, &QQuickWebEngineView::titleChanged, m_parent, &QWebEngineWebViewPrivate::q_titleChanged);
     QObject::connect(webEngineView, &QQuickWebEngineView::profileChanged,m_parent, &QWebEngineWebViewPrivate::q_profileChanged);
     QObject::connect(profile, &QQuickWebEngineProfile::httpUserAgentChanged, m_parent, &QWebEngineWebViewPrivate::q_httpUserAgentChanged);
+
     webEngineView->setParentItem(parentItem);
     m_webEngineView.reset(webEngineView);
+
+    if (!m_parent->m_cookieStore.m_cookieStore)
+        m_parent->m_cookieStore.init();
+}
+
+void QWebEngineWebViewPrivate::QWebEngineCookieStorePtr::init() const
+{
+    if (!m_webEngineViewPtr->m_webEngineView)
+        m_webEngineViewPtr->init();
+    else {
+        QWebEngineWebViewPrivate * parent = m_webEngineViewPtr->m_parent;
+        QWebEngineCookieStore *cookieStore = parent->m_profile->cookieStore();
+        m_cookieStore = cookieStore;
+
+        QObject::connect(cookieStore, &QWebEngineCookieStore::cookieAdded, parent, &QWebEngineWebViewPrivate::q_cookieAdded);
+        QObject::connect(cookieStore, &QWebEngineCookieStore::cookieRemoved, parent, &QWebEngineWebViewPrivate::q_cookieRemoved);
+    }
 }
 
 QT_END_NAMESPACE

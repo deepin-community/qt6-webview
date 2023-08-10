@@ -16,9 +16,9 @@ qt_internal_add_plugin(QDarwinWebViewPlugin
     LIBRARIES
         ${FWFoundation}
         ${FWWebKit}
-    PUBLIC_LIBRARIES
         Qt::Core
         Qt::Gui
+        Qt::Quick
         Qt::WebViewPrivate
 )
 
