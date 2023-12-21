@@ -36,11 +36,11 @@ usr/lib/${DEB_HOST_MULTIARCH}/libQt6WebView.prl
 usr/lib/${DEB_HOST_MULTIARCH}/libQt6WebView.so
 usr/lib/${DEB_HOST_MULTIARCH}/libQt6WebViewQuick.prl
 usr/lib/${DEB_HOST_MULTIARCH}/libQt6WebViewQuick.so
-usr/lib/${DEB_HOST_MULTIARCH}/metatypes/qt6webview_none_metatypes.json
-usr/lib/${DEB_HOST_MULTIARCH}/metatypes/qt6webviewquick_none_metatypes.json
 usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/Qt6WebView.pc
 usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/Qt6WebViewQuick.pc
+usr/lib/${DEB_HOST_MULTIARCH}/qt6/metatypes/qt6webview_none_metatypes.json
+usr/lib/${DEB_HOST_MULTIARCH}/qt6/metatypes/qt6webviewquick_none_metatypes.json
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/mkspecs/modules/qt_lib_webview.pri
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/mkspecs/modules/qt_lib_webviewquick.pri
-usr/share/qt6/modules/WebView.json
-usr/share/qt6/modules/WebViewQuick.json
+usr/lib/${DEB_HOST_MULTIARCH}/qt6/modules/WebView.json
+usr/lib/${DEB_HOST_MULTIARCH}/qt6/modules/WebViewQuick.json

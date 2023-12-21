@@ -2,7 +2,7 @@ Source: qt6-webview
 Section: libs
 Priority: optional
 Maintainer: Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
-Uploaders: Patrick Franz <deltaone@debian.org>, Lu YaNing <dluyaning@gmail.com>
+Uploaders: Patrick Franz <deltaone@debian.org>, Lu YaNing <dluyaning@gmail.com>,
 Build-Depends: cmake (>= 3.24~),
                debhelper-compat (= 13),
                libgl-dev,
@@ -12,17 +12,15 @@ Build-Depends: cmake (>= 3.24~),
                ninja-build,
                pkg-config,
                pkg-kde-tools,
-               qml6-module-qtwebengine (>= 6.4.2+dfsg~),
-               qml6-module-qtwebengine-controlsdelegates (>= 6.4.2+dfsg~),
-               qt6-base-dev (>= 6.4.2+dfsg~),
-               qt6-base-private-dev (>= 6.4.2+dfsg~),
-               qt6-declarative-dev (>= 6.4.2+dfsg~),
-               qt6-declarative-private-dev (>= 6.4.2+dfsg~),
-               qt6-webengine-dev (>= 6.4.2+dfsg~),
-               qt6-webengine-dev-tools (>= 6.4.2+dfsg~),
-               qt6-webengine-private-dev (>= 6.4.2+dfsg~),
-Build-Depends-Indep: qt6-base-dev (>= 6.4~) <!nodoc>,
-                     qt6-documentation-tools (>= 6.4~) <!nodoc>,
+               qt6-base-dev (>= 6.6.1+dfsg~),
+               qt6-base-private-dev (>= 6.6.1+dfsg~),
+               qt6-declarative-dev (>= 6.6.1+dfsg~),
+               qt6-declarative-private-dev (>= 6.6.1+dfsg~),
+               qt6-webengine-dev (>= 6.6.1+dfsg~),
+               qt6-webengine-dev-tools (>= 6.6.1+dfsg~),
+               qt6-webengine-private-dev (>= 6.6.1+dfsg~),
+Build-Depends-Indep: qt6-base-dev (>= 6.6~) <!nodoc>,
+                     qt6-documentation-tools (>= 6.6~) <!nodoc>,
 Standards-Version: 4.6.2
 Homepage: https://www.qt.io/developers/
 Vcs-Browser: https://salsa.debian.org/qt-kde-team/qt6/qt6-webview
@@ -32,8 +30,8 @@ Rules-Requires-Root: no
 Package: libqt6webview6
 Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Pre-Depends: ${misc:Pre-Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends},
+Pre-Depends: ${misc:Pre-Depends},
 Description: Qt 6 WebView library
  Qt is a cross-platform C++ application framework. Qt's primary feature
  is its rich set of widgets that provide standard GUI functionality.
@@ -44,26 +42,11 @@ Description: Qt 6 WebView library
  .
  This package contains the Qt 6 WebView library.
 
-Package: libqt6webviewquick6
-Architecture: amd64 arm64 armhf i386
-Multi-Arch: same
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Pre-Depends: ${misc:Pre-Depends}
-Description: Qt 6 WebView Quick library
- Qt is a cross-platform C++ application framework. Qt's primary feature
- is its rich set of widgets that provide standard GUI functionality.
- .
- Qt WebView provides a way to display web content in a QML application
- without necessarily including a full web browser stack by using
- native APIs where it makes sense.
- .
- This package contains the Qt 6 WebView Quick library.
-
 Package: qt6-webview-plugins
 Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
-Pre-Depends: ${misc:Pre-Depends}
-Depends: fontconfig, ${misc:Depends}, ${shlibs:Depends}
+Pre-Depends: ${misc:Pre-Depends},
+Depends: fontconfig, ${misc:Depends}, ${shlibs:Depends},
 Description: Qt 6 WebView plugins
  Qt is a cross-platform C++ application framework. Qt's primary feature
  is its rich set of widgets that provide standard GUI functionality.
@@ -77,8 +60,10 @@ Description: Qt 6 WebView plugins
 Package: qml6-module-qtwebview
 Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
-Depends: qml6-module-qtwebengine, ${misc:Depends}, ${shlibs:Depends}
-Pre-Depends: ${misc:Pre-Depends}
+Depends: qml6-module-qtwebengine, ${misc:Depends}, ${shlibs:Depends},
+Pre-Depends: ${misc:Pre-Depends},
+Breaks: libqt6webviewquick6,
+Replaces: libqt6webviewquick6,
 Description: Qt 6 WebView QML module
  Qt is a cross-platform C++ application framework. Qt's primary feature
  is its rich set of widgets that provide standard GUI functionality.
@@ -94,7 +79,6 @@ Architecture: amd64 arm64 armhf i386
 Multi-Arch: same
 Section: libdevel
 Depends: libqt6webview6 (= ${binary:Version}),
-         libqt6webviewquick6 (= ${binary:Version}),
          qt6-base-dev,
          qt6-declarative-dev,
          qt6-webview-plugins (= ${binary:Version}),

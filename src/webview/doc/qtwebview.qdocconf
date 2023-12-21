@@ -35,7 +35,7 @@ imagedirs  += images
 examplesinstallpath = webview
 depends = qtcore qtdoc qtgui qtquick qtqml qtwebengine qmake qtcmake
 
-Cpp.ignoretokens         += Q_WEBVIEW_EXPORT
+manifestmeta.highlighted.names = "QtWebView/Qt WebView Examples - Minibrowser"
 
 navigation.landingpage    = "Qt WebView"
 navigation.qmltypespage   = "Qt WebView QML Types"

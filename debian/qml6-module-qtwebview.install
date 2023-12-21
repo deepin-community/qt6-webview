@@ -1,3 +1,4 @@
+usr/lib/${DEB_HOST_MULTIARCH}/libQt6WebViewQuick.so.*
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/qml/QtWebView/libqtwebviewquickplugin.so
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/qml/QtWebView/plugins.qmltypes
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/qml/QtWebView/qmldir
