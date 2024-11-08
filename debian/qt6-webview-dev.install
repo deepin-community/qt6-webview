@@ -44,3 +44,6 @@ usr/lib/${DEB_HOST_MULTIARCH}/qt6/mkspecs/modules/qt_lib_webview.pri
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/mkspecs/modules/qt_lib_webviewquick.pri
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/modules/WebView.json
 usr/lib/${DEB_HOST_MULTIARCH}/qt6/modules/WebViewQuick.json
+usr/include/${DEB_HOST_MULTIARCH}/qt6/QtWebViewQuick/qtwebviewquickexports.h
+usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebView/Qt6WebViewVersionlessAliasTargets.cmake
+usr/lib/${DEB_HOST_MULTIARCH}/cmake/Qt6WebViewQuick/Qt6WebViewQuickVersionlessAliasTargets.cmake
